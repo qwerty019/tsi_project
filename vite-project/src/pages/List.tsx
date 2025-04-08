@@ -3,7 +3,7 @@ import React, { PureComponent, ReactNode } from 'react'
 interface Props {}
 interface State {}
 
-class About extends PureComponent<Props, State> {
+class Home extends PureComponent<Props, State> {
     constructor(props: Props) {
         super(props)
 
@@ -14,9 +14,9 @@ class About extends PureComponent<Props, State> {
 
     render(): ReactNode {
         return (
-        <div>Hello</div> 
+            <div>Haha</div>
         )
     }
 }
 
-export default About
+export default Home

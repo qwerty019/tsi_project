@@ -8,7 +8,9 @@ interface NewsProps {}
 interface NewsState {}
 
 class News extends PureComponent<NewsProps, NewsState> {
+    
   render() {
+    
     return (
       <Container>
         <div className="flex gap-4 mb-6">
@@ -34,5 +36,6 @@ class News extends PureComponent<NewsProps, NewsState> {
     );
   }
 }
+
 
 export default News;

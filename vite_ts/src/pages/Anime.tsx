@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Container } from '../components/Container';
+import axios from 'axios';
 
 interface AnimeItem {
   title: string;
   description: string;
-  price: string;
+  score: string;
 }
 
 const AnimeList: React.FC<{ animes: AnimeItem[] }> = ({ animes }) => {
@@ -16,7 +17,7 @@ const AnimeList: React.FC<{ animes: AnimeItem[] }> = ({ animes }) => {
           <li key={index} className="bg-white p-4 rounded shadow">
             <h3 className="font-bold text-lg">{anime.title}</h3>
             <p className="text-gray-600">{anime.description}</p>
-            <p className="text-blue-500">Оценка: {anime.price}</p>
+            <p className="text-blue-500">Оценка: {anime.score}</p>
           </li>
         ))}
       </ul>
@@ -27,22 +28,46 @@ const AnimeList: React.FC<{ animes: AnimeItem[] }> = ({ animes }) => {
 const AnimePage: React.FC = () => {
   const [animes, setAnimes] = useState<AnimeItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newAnime, setNewAnime] = useState<AnimeItem>({ title: '', description: '', price: '' });
+  const [newAnime, setNewAnime] = useState<AnimeItem>({ title: '', description: '', score: '' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setNewAnime({ ...newAnime, [name]: value });
   };
 
-  const handleAddAnime = () => {
-    if (newAnime.title && newAnime.description && newAnime.price) {
-      setAnimes([...animes, newAnime]);
-      setNewAnime({ title: '', description: '', price: '' });
-      setIsModalOpen(false);
-    } else {
+  const handleAddAnime = async () => {
+    if (!newAnime.title || !newAnime.description || !newAnime.score) {
       alert("Пожалуйста, заполните все поля");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Отправляем POST-запрос на сервер
+      const response = await axios.post('http://localhost:5000/api/data', {
+        title: newAnime.title,
+        description: newAnime.description,
+        score: newAnime.score
+      });
+
+      // Если сервер вернул успешный ответ, обновляем состояние
+      setAnimes([...animes, newAnime]);
+      setNewAnime({ title: '', description: '', score: '' });
+      setIsModalOpen(false);
+      
+      console.log('Данные успешно отправлены:', response.data);
+    } catch (err) {
+      console.error('Ошибка при отправке данных:', err);
+      setError('Не удалось добавить аниме. Попробуйте снова.');
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <Container>
@@ -76,9 +101,9 @@ const AnimePage: React.FC = () => {
               />
               <input
                 type="number"
-                name="price"
+                name="score"
                 placeholder="Оценка"
-                value={newAnime.price}
+                value={newAnime.score}
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded mb-4"
               />
